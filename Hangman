@@ -1,0 +1,94 @@
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+public class Hangman{
+    private static JFrame mainFrame;
+    private static JPanel container;
+    public static void main(String[] args){
+        //setting up the JFrame (pop-up window to play game)
+        mainFrame = new JFrame("Hangman");
+        mainFrame.setSize(616, 900);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //quit the app after clicking the "red cross"
+        mainFrame.setVisible(true);
+        
+        //make the arraylist of words that can be used in the game
+        ArrayList<String> words = new ArrayList<String>();
+        words.add("THOUSAND");
+        words.add("ABRUPTLY");
+        words.add("JOGGING");
+        words.add("MICROWAVE");
+        words.add("LUXURY");
+        words.add("SUBWAY");
+        words.add("TRANSCRIPT");
+        words.add("UNKNOWN");
+        words.add("XYLOPHONE");
+        words.add("PUZZLING"); 
+        
+        container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.PAGE_AXIS));
+        DrawHangman hangman = new DrawHangman();
+        
+        playGame(chooseWord(words), hangman);
+        
+        container.add(hangman);
+        
+        mainFrame.add(container);
+    }
+    public static String chooseWord(ArrayList<String> words)
+    {
+        int choose = (int)(Math.random()*10);
+        return words.get(choose);
+    }
+    public static void playGame(String gameWord, DrawHangman hangman)
+    {
+        ArrayList<String> result = new ArrayList<String>();
+        //add _ for each letter to signify a blank
+        for(int k = 0; k<gameWord.length();k++)
+        {
+            result.add("_");
+        }
+        Scanner scan = new Scanner(System.in);
+        int wrong = 0;
+        int full = 0;
+        System.out.println("The word has " + gameWord.length() + " letters.");
+        while(wrong < 5)
+        {
+            int count = 0;
+            System.out.println("Guess a letter");
+            String guess = scan.nextLine().toUpperCase();
+            for(int i = 0; i<gameWord.length();i++)
+            {
+                if(gameWord.substring(i, i+1).equals(guess))
+                {
+                    count++;
+                    full++;
+                    result.set(i,guess);
+                }
+            }
+            if(count == 0)
+            {
+                wrong++;
+                changeGUI(hangman, wrong);
+            }
+            System.out.println("This is your current result: " + result + "\n\n");
+            if(full == result.size())
+            {
+                System.out.println("YOU WIN!");
+                return;
+            }
+            if(wrong == 5) 
+            {
+                System.out.println("YOU LOSE!");
+            }
+        }
+    }
+    public static void changeGUI(DrawHangman hangman, int i){
+        mainFrame.getContentPane().revalidate();
+        hangman.setMode(i);
+        container.add(hangman);
+        mainFrame.add(container);
+        mainFrame.repaint();
+    }
+}
